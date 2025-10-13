@@ -19,8 +19,6 @@ struct PhotoListView: View {
             Group {
                 if photoInfoVM.isLoading && photoInfoVM.photoInfoEntries.isEmpty {
                     ProgressView("Fetching Photos...")
-                } else if let errorMessage = photoInfoVM.errorMessage {
-                    ErrorView(errorMessage: errorMessage)
                 } else {
                     List($photoInfoVM.photoInfoEntries) { photoInfoEntry in
                         switch photoInfoEntry.wrappedValue{
@@ -46,9 +44,12 @@ struct PhotoListView: View {
                     .listStyle(.plain)
                 }
             }
-            .navigationTitle("NASA Daily Photos")
-            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("NASA Daily Photos")
+                        .font(.title)
+                        .fontWeight(.semibold)
+                }
                 ToolbarItem(placement: .primaryAction) {
                     Button {
                         isDatePickerPresented = true
@@ -57,6 +58,7 @@ struct PhotoListView: View {
                     }
                 }
             }
+            .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $isDatePickerPresented) {
                 DatePickerView(selectedDate: $selectedEndDate) {
                     Task {

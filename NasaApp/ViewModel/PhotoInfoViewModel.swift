@@ -17,7 +17,6 @@ class PhotoInfoViewModel: ObservableObject {
     @Published private(set) var errorMessage: String?
     
     func fetchPhotoEntries(for endDate: Date) async {
-//        guard photoInfoEntries.isEmpty else { return }
         isLoading = true
         errorMessage = nil
         photoInfoEntries.removeAll()
