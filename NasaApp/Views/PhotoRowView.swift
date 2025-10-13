@@ -28,26 +28,22 @@ struct PhotoRowView: View {
                     EmptyView()
                 }
             }
-            .frame(width: 80, height: 80)
+            .frame(width: 60, height: 60)
             .background(Color.gray.opacity(0.1))
             .clipShape(RoundedRectangle(cornerRadius: 8))
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(photoInfo.title)
                     .font(.headline)
-
+                    .lineLimit(2, reservesSpace: true)
                 Text(photoInfo.date)
-                    .font(.subheadline)
+                    .font(.callout)
                     .foregroundColor(.secondary)
-
-                Text(photoInfo.description)
-                    .font(.body)
-                    .lineLimit(1)
-                    .padding(.top, 4)
             }
+            Spacer()
             FavoriteButton(isSet: $photoInfo.isFavorite)
         }
-        .padding(.vertical, 8)
+        .frame(height: 60)
     }
 }
 

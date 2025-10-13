@@ -16,7 +16,7 @@ struct MissingDataRowView: View {
             Image(systemName: "photo.fill")
                 .font(.largeTitle)
                 .foregroundColor(.secondary)
-                .frame(width: 80, height: 80)
+                .frame(width: 60, height: 60)
                 .background(Color.gray.opacity(0.1))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
 
@@ -26,11 +26,11 @@ struct MissingDataRowView: View {
                     .foregroundColor(.secondary)
                 
                 Text("Data not available for this day.")
-                    .font(.body)
+                    .font(.callout)
                     .foregroundColor(.secondary)
             }
         }
-        .padding(.vertical, 8)
+        .frame(height: 60)
     }
 }
 

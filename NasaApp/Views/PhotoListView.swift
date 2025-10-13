@@ -11,7 +11,9 @@ import SwiftData
 
 struct PhotoListView: View {
     @StateObject private var photoInfoVM = PhotoInfoViewModel()
-
+    @State private var selectedEndDate: Date = .now
+    @State private var isDatePickerPresented = false
+    
     var body: some View {
         NavigationStack {
             Group {
@@ -44,11 +46,26 @@ struct PhotoListView: View {
                     .listStyle(.plain)
                 }
             }
-            .navigationTitle("Last 20 Astronomy Photos of the Day")
+            .navigationTitle("NASA Daily Photos")
             .navigationBarTitleDisplayMode(.inline)
-            
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        isDatePickerPresented = true
+                    } label: {
+                        Image(systemName: "calendar")
+                    }
+                }
+            }
+            .sheet(isPresented: $isDatePickerPresented) {
+                DatePickerView(selectedDate: $selectedEndDate) {
+                    Task {
+                        await photoInfoVM.fetchPhotoEntries(for: selectedEndDate)
+                    }
+                }
+            }
             .task {
-                await photoInfoVM.fetchLastTwentyDays()
+                await photoInfoVM.fetchPhotoEntries(for: selectedEndDate)
             }
         }
     }

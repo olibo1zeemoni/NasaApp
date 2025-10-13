@@ -16,18 +16,17 @@ class PhotoInfoViewModel: ObservableObject {
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var errorMessage: String?
     
-    func fetchLastTwentyDays() async {
-        guard photoInfoEntries.isEmpty else { return }
+    func fetchPhotoEntries(for endDate: Date) async {
+//        guard photoInfoEntries.isEmpty else { return }
         isLoading = true
         errorMessage = nil
+        photoInfoEntries.removeAll()
         
         let calendar = Calendar.current
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
-        let today = Date.now
         
-        guard let endDate = dateFormatter.date(from: dateFormatter.string(from: today)),
-              let startDate = calendar.date(byAdding: .day, value: -19, to: endDate) else {
+        guard let startDate = calendar.date(byAdding: .day, value: -19, to: endDate) else {
             errorMessage = "Date range out of scope."
             isLoading = false
             return
