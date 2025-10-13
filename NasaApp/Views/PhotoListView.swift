@@ -15,13 +15,31 @@ struct PhotoListView: View {
     var body: some View {
         NavigationStack {
             Group {
-                if photoInfoVM.isLoading && photoInfoVM.photoInfos.isEmpty {
+                if photoInfoVM.isLoading && photoInfoVM.photoInfoEntries.isEmpty {
                     ProgressView("Fetching Photos...")
                 } else if let errorMessage = photoInfoVM.errorMessage {
-                   ErrorView(errorMessage: errorMessage)
+                    ErrorView(errorMessage: errorMessage)
                 } else {
-                    List($photoInfoVM.photoInfos) { $photoInfo in
-                        PhotoRowView(photoInfo: $photoInfo)
+                    List($photoInfoVM.photoInfoEntries) { photoInfoEntry in
+                        switch photoInfoEntry.wrappedValue{
+                        case .success(let photoInfo):
+                            let photoInfoBinding = Binding(
+                                get: {
+                                    if case .success(let info) = photoInfoEntry.wrappedValue {
+                                        return info
+                                    } else {
+                                        return photoInfo
+                                    }
+                                },
+                                set: { newPhotoInfo in
+                                    photoInfoEntry.wrappedValue = .success(newPhotoInfo)
+                                }
+                            )
+                            PhotoRowView(photoInfo: photoInfoBinding)
+                            
+                        case .failure(id: let date):
+                            MissingDataRowView(date: date)
+                        }
                     }
                     .listStyle(.plain)
                 }
@@ -39,3 +57,4 @@ struct PhotoListView: View {
 #Preview {
     PhotoListView()
 }
+

@@ -7,27 +7,26 @@
 
 import Foundation
 import Combine
+import SwiftUI
 
 
 @MainActor
 class PhotoInfoViewModel: ObservableObject {
-    @Published var photoInfos: [PhotoInfo] = []
+    @Published var photoInfoEntries: [PhotoInfoEntry] = []
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var errorMessage: String?
     
     func fetchLastTwentyDays() async {
-        guard photoInfos.isEmpty else { return }
+        guard photoInfoEntries.isEmpty else { return }
         isLoading = true
         errorMessage = nil
         
         let calendar = Calendar.current
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
+        let today = Date.now
         
-        //        let today = Date.now
-        
-        
-        guard let endDate = dateFormatter.date(from: "2025-01-31"),
+        guard let endDate = dateFormatter.date(from: dateFormatter.string(from: today)),
               let startDate = calendar.date(byAdding: .day, value: -19, to: endDate) else {
             errorMessage = "Date range out of scope."
             isLoading = false
@@ -42,22 +41,28 @@ class PhotoInfoViewModel: ObservableObject {
         }
         
         do {
-            let infos = try await withThrowingTaskGroup(of: PhotoInfo.self) { group in
-                var results = [PhotoInfo]()
+            let entries = try await withThrowingTaskGroup(of: PhotoInfoEntry.self) { group in
+                var results = [PhotoInfoEntry]()
                 
                 for date in dates {
                     let dateString = dateFormatter.string(from: date)
                     group.addTask {
-                        return try await self.fetchPhotoInfo(for: dateString)
+                        do {
+                            let info = try await self.fetchPhotoInfo(for: dateString)
+                            return .success(info)
+                        } catch {
+                            return .failure(id: dateString)
+                        }
                     }
                 }
-                for try await info in group {
-                    results.append(info)
+                
+                for try await entry in group {
+                    results.append(entry)
                 }
                 return results
             }
             
-            self.photoInfos = infos.sorted { $0.date > $1.date }
+            self.photoInfoEntries = entries.sorted { $0.id > $1.id }
             
         } catch {
             self.errorMessage = error.localizedDescription
