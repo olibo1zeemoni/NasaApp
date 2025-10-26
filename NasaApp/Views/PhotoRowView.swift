@@ -12,21 +12,12 @@ struct PhotoRowView: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 16) {
-            AsyncImage(url: photoInfo.url) { phase in
-                switch phase {
-                case .empty:
-                    ProgressView()
-                case .success(let image):
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                case .failure:
-                    Image(systemName: "photo.trianglebadge.exclamationmark")
-                        .font(.largeTitle)
-                        .foregroundColor(.secondary)
-                @unknown default:
-                    EmptyView()
-                }
+            CachedAsyncImage(url: photoInfo.url) { image in
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            } placeholder: {
+                ProgressView()
             }
             .frame(width: 60, height: 60)
             .background(Color.gray.opacity(0.1))

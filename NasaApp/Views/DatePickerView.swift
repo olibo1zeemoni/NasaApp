@@ -21,8 +21,8 @@ struct DatePickerView: View {
     
     private var dateRange: ClosedRange<Date> {
         let calendar = Calendar.current
-        let startDate = calendar.date(from: DateComponents(year: 2001, month: 01, day: 01)) ?? Date()
-        let endDate = Date()
+        let startDate = calendar.date(from: DateComponents(year: 1995, month: 10, day: 01)) ?? Date()
+        let endDate = calendar.date(from: DateComponents(year: 2025, month: 10, day: 01)) ?? Date()
         return startDate...endDate
     }
     

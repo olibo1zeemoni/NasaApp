@@ -11,7 +11,7 @@ import SwiftData
 
 struct PhotoListView: View {
     @StateObject private var photoInfoVM = PhotoInfoViewModel()
-    @State private var selectedEndDate: Date = .now
+    @State private var selectedEndDate: Date = Calendar.current.date(from: DateComponents(year: 2025, month: 10, day: 01))!
     @State private var isDatePickerPresented = false
     
     var body: some View {
@@ -55,6 +55,7 @@ struct PhotoListView: View {
                         isDatePickerPresented = true
                     } label: {
                         Image(systemName: "calendar")
+                            .foregroundStyle(.blue)
                     }
                 }
             }

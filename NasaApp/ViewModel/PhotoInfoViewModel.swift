@@ -15,6 +15,7 @@ class PhotoInfoViewModel: ObservableObject {
     @Published var photoInfoEntries: [PhotoInfoEntry] = []
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var errorMessage: String?
+    private var photoCache = [String: PhotoInfoEntry]()
     
     func fetchPhotoEntries(for endDate: Date) async {
         isLoading = true
@@ -38,35 +39,44 @@ class PhotoInfoViewModel: ObservableObject {
             currentDate = calendar.date(byAdding: .day, value: 1, to: currentDate)!
         }
         
-        do {
-            let entries = try await withThrowingTaskGroup(of: PhotoInfoEntry.self) { group in
-                var results = [PhotoInfoEntry]()
-                
-                for date in dates {
-                    let dateString = dateFormatter.string(from: date)
-                    group.addTask {
-                        do {
-                            let info = try await self.fetchPhotoInfo(for: dateString)
-                            return .success(info)
-                        } catch {
-                            return .failure(id: dateString)
-                        }
-                    }
+        let entries =  await withTaskGroup(of: PhotoInfoEntry.self, returning: [PhotoInfoEntry].self) { group in
+            var results = [PhotoInfoEntry]()
+            
+            for date in dates {
+                let dateString = dateFormatter.string(from: date)
+                group.addTask {
+                    return await self.entry(for: dateString)
                 }
-                
-                for try await entry in group {
-                    results.append(entry)
-                }
-                return results
             }
             
-            self.photoInfoEntries = entries.sorted { $0.id > $1.id }
-            
-        } catch {
-            self.errorMessage = error.localizedDescription
+            for  await entry in group {
+                results.append(entry)
+            }
+            return results
         }
+        
+        self.photoInfoEntries = entries.sorted { $0.id > $1.id }
         isLoading = false
     }
+    
+    private func entry(for dateString: String) async -> PhotoInfoEntry {
+          if let cachedEntry = photoCache[dateString] {
+              return cachedEntry
+          }
+          
+          let entry: PhotoInfoEntry
+          do {
+              let info = try await fetchPhotoInfo(for: dateString)
+              entry = .success(info)
+          } catch {
+              entry = .failure(id: dateString)
+          }
+          
+          // Store the result (success or failure) in the cache.
+          photoCache[dateString] = entry
+          
+          return entry
+      }
     
     
     private func fetchPhotoInfo(for date: String) async throws -> PhotoInfo {
