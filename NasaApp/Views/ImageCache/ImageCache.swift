@@ -15,10 +15,7 @@ final class ImageCache {
     private let cache = NSCache<NSURL, UIImage>()
     private init() {}
     
-    /// Accesses the image for the given URL.
-    ///
-    /// Use this subscript to get or set images in the cache.
-    /// `cache[url] = image`
+
     /// `let image = cache[url]`
     subscript(url: URL) -> UIImage? {
         get {

@@ -7,6 +7,13 @@
 
 
 import Foundation
+
+enum MediaType: String, Codable {
+    case image
+    case video
+    case other
+}
+
 struct PhotoInfo: Codable, Identifiable {
     var id: URL { url }
     var title: String
@@ -15,7 +22,7 @@ struct PhotoInfo: Codable, Identifiable {
     var description: String
     var date: String
     var isFavorite: Bool = false
-    
+    let mediaType : MediaType
 
 
     enum CodingKeys: String, CodingKey {
@@ -24,6 +31,7 @@ struct PhotoInfo: Codable, Identifiable {
         case url
         case title
         case date
+        case mediaType = "media_type"
     }
     
 }
