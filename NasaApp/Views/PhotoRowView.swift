@@ -9,6 +9,7 @@ import SwiftUI
 
 struct PhotoRowView: View {
     @Binding var photoInfo: PhotoInfo
+    let url = Bundle.main.url(forResource: "kids-swimming", withExtension: "mp4")!
 
     var body: some View {
         HStack(alignment: .center, spacing: 16) {
@@ -48,15 +49,12 @@ extension PhotoRowView {
                     }
                 }
             case .video:
-                VideoPlayerView(url: photoInfo.url, isPlaying: true)
-//                    .overlay(
-//                        Image(systemName: "play.circle.fill")
-//                            .font(.title)
-//                            .foregroundColor(.white.opacity(0.7))
-//                            .allowsHitTesting(false) // Prevents the icon from blocking gestures.
-//                    )
+                YouTubeVideoView(videoID: photoInfo.url.lastPathComponent)
+                    .onAppear {
+                        print(photoInfo.url.lastPathComponent)
+                    }
             case .other:
-                EmptyView()
+                VideoPlayerView(url: photoInfo.url, isPlaying: true)
             }
         }
 }
@@ -70,18 +68,20 @@ extension PhotoRowView {
 
 #Preview {
     let samplePhoto = PhotoInfo(
-        title: "Jupiter's Swirling Storms",
+        title: "Blue Ghost Shadow",
         copyright: "NASA/JPL-Caltech",
-        url: URL(string: "https://apod.nasa.gov/apod/image/2401/ngc1333_hubble_960.jpg")!,
+        url: URL(string: "https://apod.nasa.gov/apod/image/2503/BlueGhostShadow_Firefly_960.jpg")!,
         description: "This is a sample description of the astronomy picture of the day.",
         date: "2024-12-25",
         mediaType: .image
     )
-    
+    let bundleURL = Bundle.main.url(forResource: "kids-swimming", withExtension: "mp4")!
+    let liveURL = URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")!
+    let youTubeUrl = URL(string: "https://www.youtube.com/embed/my1euFQHH-o?rel=0")!
     let sampleVideo = PhotoInfo(
-        title: "Perseverance Rover Landing",
-        copyright: "NASA/JPL-Caltech",
-        url: URL(string: "https://www.nasa.gov/wp-content/uploads/2022/07/marstrekker-perseverance-8k-v2-final.mp4")!,
+        title: "Big Buck Bunny",
+        copyright: "Google APIs",
+        url: youTubeUrl,
         description: "Onboard cameras capture the dramatic entry, descent, and landing.",
         date: "2024-12-24",
         mediaType: .video
@@ -94,3 +94,4 @@ extension PhotoRowView {
     }
     .padding()
 }
+
